@@ -204,8 +204,8 @@ class PayPal {
 		// build request array
 		$parameters = array(
 				'PAYMENTREQUEST_0_PAYMENTACTION'	=>	$type,
-				'&PAYMENTREQUEST_0_AMT'			=>	$amount,
-				'&PAYMENTREQUEST_0_CURRENCYCODE'	=>	$currency,
+				'PAYMENTREQUEST_0_AMT'			=>	$amount,
+				'PAYMENTREQUEST_0_CURRENCYCODE'		=>	$currency,
 				'returnUrl'				=>	$returnURI,
 				'cancelUrl'				=>	$cancelURI
 		);
