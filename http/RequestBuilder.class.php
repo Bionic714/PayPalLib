@@ -104,7 +104,10 @@ class RequestBuilder {
 	 */
 	public function addHeader($name, $value) {
 		$index = count($this->headers);
-		$this->headers[] = array($name, $value);
+		$this->headers[] = array(
+			'name'		=> $name,
+			'value'		=> $value
+		);
 		return $index;
 	}
 	
