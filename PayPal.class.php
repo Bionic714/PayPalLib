@@ -220,7 +220,7 @@ class PayPal {
 	
 	/**
 	 * Validates the payment
-	 * @return			boolean
+	 * @return			object
 	 * @throws			PayPalException
 	 */
 	public function validatePayment() {
@@ -242,7 +242,10 @@ class PayPal {
 		if (strtoupper($response['ACK']) != 'SUCCESS') throw new PayPalException('Got no valid response from PayPal. This seems to be a bad joke ...');
 		
 		// everything's good
-		return $token;
+		return (object) array(
+			'token'		=>	$token,
+			'payerID'	=>	$response['PAYERID']
+		);
 	}
 	
 	/**
