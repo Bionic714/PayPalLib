@@ -21,3 +21,5 @@ There are some examples in the /samples/ folder.
 
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+The whole license can be found in the LICENSE file.
