@@ -40,5 +40,11 @@ interface IPayPalProxy {
 	 * @throws			PayPalException
 	 */
 	public function send($data);
+	
+	/**
+	 * Indicates whether the proxy can be used for querying PayPal.
+	 * @return			boolean
+	 */
+	public static function isSupported();
 }
 ?>
