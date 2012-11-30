@@ -206,8 +206,8 @@ class PayPal {
 				'PAYMENTREQUEST_0_PAYMENTACTION'	=>	$type,
 				'PAYMENTREQUEST_0_AMT'			=>	$amount,
 				'PAYMENTREQUEST_0_CURRENCYCODE'		=>	$currency,
-				'returnUrl'				=>	$returnURI,
-				'cancelUrl'				=>	$cancelURI
+				'ReturnUrl'				=>	$returnURI,
+				'CancelUrl'				=>	$cancelURI
 		);
 		$response = $this->call('SetExpressCheckout', $parameters);
 	

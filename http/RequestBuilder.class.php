@@ -287,8 +287,7 @@ class RequestBuilder {
 		if (empty($this->host)) throw new RequestException("No hostname supplied.");
 		
 		// build request header
-		$request = $this->type.' '.$this->path.(!empty($this->query) ? $this->query : '').static::NEWLINE;
-		$request .= static::HTTP_HEADER.static::NEWLINE;
+		$request = $this->type.' '.$this->path.(!empty($this->query) ? $this->query : '').' '.static::HTTP_HEADER.static::NEWLINE;
 		$request .= 'User-Agent: '.$this->userAgent.static::NEWLINE;
 		$request .= 'Accept: */*'.static::NEWLINE;
 		$request .= 'Host: '.$this->host.static::NEWLINE;
