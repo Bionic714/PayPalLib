@@ -142,7 +142,9 @@ class PayPal {
 	 * @return			mixed[]
 	 */
 	public function decodeRequest($raw) {
-		return parse_str($raw);
+		$return = array();
+		parse_str($raw, $return);
+		return $return;
 	}
 	
 	/**
