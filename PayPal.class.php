@@ -21,7 +21,12 @@ namespace paypal;
 define('PAYPAL_DIRECTORY', dirname(__FILE__).'/');
 
 // includes
-require_once(PAYPAL_DIRECTORY.'proxy/IPayPalProxy.class.php');
+require_once(PAYPAL_DIRECTORY.'PayPalException.class.php');
+
+require_once(PAYPAL_DIRECTORY.'http/RequestBuilder.class.php');
+require_once(PAYPAL_DIRECTORY.'http/RequestException.class.php');
+
+require_once(PAYPAL_DIRECTORY.'proxy/IProxy.class.php');
 require_once(PAYPAL_DIRECTORY.'proxy/FsockProxy.class.php');
 
 /**
