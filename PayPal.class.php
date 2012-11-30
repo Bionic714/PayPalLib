@@ -176,6 +176,7 @@ class PayPal {
 	 */
 	public function setCallProxy(proxy\IProxy $instance) {
 		$this->proxy = $instance;
+		$this->proxy->init($this->serverURI);
 	}
 	
 	/**
