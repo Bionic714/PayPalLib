@@ -16,6 +16,7 @@
  * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace paypal\http;
+use \Exception;
 
 /**
  * This exception occurs if someone was too dumb to use the request builder.
