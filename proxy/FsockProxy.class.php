@@ -17,6 +17,7 @@
  */
 namespace paypal\proxy;
 use paypal\PayPal;
+use paypal\PayPalException;
 
 /**
  * 
