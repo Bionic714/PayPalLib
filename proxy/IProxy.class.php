@@ -24,7 +24,7 @@ namespace paypal\proxy;
  * @license			All rights reserved.
  * @category			PayPal/
  */
-interface IPayPalProxy {
+interface IProxy {
 	
 	/**
 	 * Inits the proxy.
