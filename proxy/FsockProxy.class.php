@@ -16,6 +16,8 @@
  * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace paypal\proxy;
+use paypal\http\RequestBuilder;
+use paypal\http\RequestException;
 use paypal\PayPal;
 use paypal\PayPalException;
 

@@ -16,6 +16,8 @@
  * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace paypal;
+use paypal\proxy\IProxy;
+use paypal\proxy\FsockProxy;
 
 // defines
 define('PAYPAL_DIRECTORY', dirname(__FILE__).'/');
