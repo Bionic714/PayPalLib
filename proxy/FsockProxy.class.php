@@ -79,31 +79,35 @@ class FsockProxy implements IProxy {
 		fwrite($socket, $query->__toString());
 		
 		// read return value
-		$waiting = true;
-		$response = array();
-		$buffer = "";
+		$inHeader = true;
+		$rawHeaders = array();
+		$buffer = '';
 		
 		while(!feof($socket)) {
 			// append contents
-			$response[] = fgets($socket);
+			$line = fgets($socket);
 			
-			if ($waiting)
-				if (rtrim($response[count($response) - 1]) == '') $waiting = false;
-			else {
-				$errorHeaders = array(201, 300, 301, 302, 303, 307, 400, 401, 403, 404, 405, 408, 410, 418, 500, 501, 502, 503, 504, 505, 509);
-				$error = false;
-				
-				foreach($errorHeaders as $code) {
-					$error = strpos($response[0], $code);
+			if ($inHeader) {
+				if (rtrim($line) == '') {
+					$inHeader = false;
+					continue;
 				}
 				
-				// check for errors occured during execution
-				if ($error !== false) throw new PayPalException("Cannot read data from API.");
-				
+				$rawHeaders[] = $line;
+			} else {
 				// append data
-				$buffer .= $response[count($response) - 1];
+				$buffer .= $line;
 			}
 		}
+		
+		$headers = array();
+		foreach($rawHeaders as $header) {
+			if (strpos($header, ':') === false) continue;
+			$exploded = explode(':', $header, 2);
+			$headers[$exploded[0]] = $exploded[1];
+		}
+		
+		if (strpos($rawHeaders[0], '200') === false) throw new PayPalException('Got error code from server.'); // TODO: This is pretty simple.
 		
 		// shut down socket
 		fclose($socket);
