@@ -72,7 +72,7 @@ class FsockProxy implements IProxy {
 		
 		// open socket
 		$errorNo = $errorString = null;
-		$socket = fsockopen(($query->isSSLEnabled() ? 'ssl://' : '').$uri['host'], $uri['port'], $errorNo, $errorString);
+		$socket = fsockopen(($query->isSSLEnabled() ? 'ssl://' : '').$uri['host'], (isset($uri['port']) ? $uri['port'] : ($query->isSSLEnabled() ? 443 : 80)), $errorNo, $errorString);
 		
 		// validate socket
 		if ($socket === false) throw new PayPalException("Cannot open socket (".$errorNo."): ".errorString);
