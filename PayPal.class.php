@@ -44,7 +44,7 @@ class PayPal {
 	 * Defines the API version to use.
 	 * @var			string
 	 */
-	const API_VERSION = '53.0';
+	const API_VERSION = '95';
 	
 	/**
 	 * Defines the authorization URI used for production use.
@@ -203,11 +203,11 @@ class PayPal {
 	public function startPayment($amount, $currency, $returnURI, $cancelURI, $type) {
 		// build request array
 		$parameters = array(
-				'AMT'			=>	$amount,
-				'PAYMENTACTION'		=>	$type,
-				'RETURNURL'		=>	$returnURI,
-				'CANCELURL'		=>	$cancelURI,
-				'CURRENCYCODE'		=>	$currency
+				'PAYMENTREQUEST_0_PAYMENTACTION'	=>	$type,
+				'&PAYMENTREQUEST_0_AMT'			=>	$amount,
+				'&PAYMENTREQUEST_0_CURRENCYCODE'	=>	$currency,
+				'returnUrl'				=>	$returnURI,
+				'cancelUrl'				=>	$cancelURI
 		);
 		$response = $this->call('SetExpressCheckout', $parameters);
 	
@@ -242,7 +242,31 @@ class PayPal {
 		if (strtoupper($response['ACK']) != 'SUCCESS') throw new PayPalException('Got no valid response from PayPal. This seems to be a bad joke ...');
 		
 		// everything's good
-		return true;
+		return $token;
+	}
+	
+	/**
+	 * Executes the payment (last step).
+	 * @param			string			$token
+	 * @param			string			$payerID
+	 * @param			float			$amount
+	 * @param			string			$currency
+	 * @param			string			$type
+	 */
+	public function pay($token, $payerID, $amount, $currency, $type) {
+		// get parameters ready
+		$parameters = array(
+			'TOKEN'					=>	$token,
+			'PAYERID'				=>	$payerID,
+			'PAYMENTREQUEST_0_PAYMENTACTION'	=>	$type,
+			'PAYMENTREQUEST_0_AMT'			=>	$amount,
+			'PAYMENTREQUEST_0_CURRENCYCODE'		=>	$currency
+		);
+		
+		$response = $this->call('DoExpressCheckoutPayment', $parameters);
+		
+		// validate
+		if ($response['ACK'] != 'SUCCESS') throw new PayPalException('Got no valid response from PayPal. Payment failed.');
 	}
 }
 ?>
