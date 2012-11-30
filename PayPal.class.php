@@ -53,6 +53,12 @@ class PayPal {
 	const DEFAULT_AUTHORIZATION_URI = 'https://www.paypal.com/webscr&cmd=_express-checkout&token=%s';
 	
 	/**
+	 * Defines the server URI used for development purposes (i.e. sandbox)
+	 * @var			string
+	 */
+	const DEFAULT_SERVER_URI = 'https://api-3t.paypal.com/nvp';
+	
+	/**
 	 * Defines the authorization URI used for development purposes (i.e. sandbox).
 	 * @var			string
 	 */
@@ -188,6 +194,7 @@ class PayPal {
 	 */
 	public function setDevelopmentMode($mode) {
 		$this->serverURI = ($mode ? static::DEVELOPMENT_SERVER_URI : static::DEFAULT_SERVER_URI);
+		$this->authorizationURI = ($mode ? static::DEVELOPMENT_AUTHORIZATION_URI : static::AUTHORIZATION_URI);
 	}
 	
 	/**
@@ -200,22 +207,23 @@ class PayPal {
 	 * @return			void
 	 * @throws			PayPalException
 	 */
-	public function startPayment($amount, $currency, $returnURI, $cancelURI, $type) {
+	public function startPayment($amount, $currency, $returnURI, $cancelURI, $type, $additionalParameters = array()) {
 		// build request array
 		$parameters = array(
 				'PAYMENTREQUEST_0_PAYMENTACTION'	=>	$type,
 				'PAYMENTREQUEST_0_AMT'			=>	$amount,
 				'PAYMENTREQUEST_0_CURRENCYCODE'		=>	$currency,
-				'ReturnUrl'				=>	$returnURI,
-				'CancelUrl'				=>	$cancelURI
+				'RETURNURL'				=>	$returnURI,
+				'CANCELURL'				=>	$cancelURI
 		);
+		$parameters = array_merge($parameters, $additionalParameters);
 		$response = $this->call('SetExpressCheckout', $parameters);
-	
+		
 		// validate
 		if (strtoupper($response['ACK']) != 'SUCCESS') throw new PayPalException('Cannot start payment: Got wrong status code from API.');
 	
 		// redirect
-		$this->redirect($this->authorizationURI.urldecode($response['TOKEN']));
+		$this->redirect(sprintf($this->authorizationURI, urldecode($response['TOKEN'])));
 	}
 	
 	/**
@@ -223,7 +231,7 @@ class PayPal {
 	 * @return			object
 	 * @throws			PayPalException
 	 */
-	public function validatePayment() {
+	public function validatePayment($additionalParameters = array()) {
 		// validate request
 		if (!isset($_REQUEST['token']) or empty($_REQUEST['token'])) throw new PayPalException('No payment information found in request.');
 		
@@ -234,6 +242,7 @@ class PayPal {
 		$parameters = array(
 			'TOKEN'		=>	$token
 		);
+		$parameters = array_merge($parameters, $additionalParameters);
 		
 		// send verification request
 		$response = $this->call('GetExpressCheckoutDetails', $parameters);
@@ -256,7 +265,7 @@ class PayPal {
 	 * @param			string			$currency
 	 * @param			string			$type
 	 */
-	public function pay($token, $payerID, $amount, $currency, $type) {
+	public function pay($token, $payerID, $amount, $currency, $type, $additionalParameters = array()) {
 		// get parameters ready
 		$parameters = array(
 			'TOKEN'					=>	$token,
@@ -265,11 +274,39 @@ class PayPal {
 			'PAYMENTREQUEST_0_AMT'			=>	$amount,
 			'PAYMENTREQUEST_0_CURRENCYCODE'		=>	$currency
 		);
+		$parameters = array_merge($parameters, $additionalParameters);
 		
 		$response = $this->call('DoExpressCheckoutPayment', $parameters);
 		
 		// validate
-		if ($response['ACK'] != 'SUCCESS') throw new PayPalException('Got no valid response from PayPal. Payment failed.');
+		if (strtoupper($response['ACK']) != 'SUCCESS') throw new PayPalException('Got no valid response from PayPal. Payment failed.');
+		
+		return (object) array(
+			'transactionID'		=>	$response['PAYMENTINFO_0_TRANSACTIONID']
+		);
+	}
+	
+	/**
+	 * Captures the money.
+	 * @param		string			$transactionID
+	 * @param		float			$amount
+	 * @param		string			$currency
+	 * @param		string			$type
+	 * @param		mixed[]			$additionalParameters
+	 * @throws		PayPalException
+	 */
+	public function capture($transactionID, $amount, $currency, $type, $additionalParameters = array()) {
+		$parameters = array(
+			'AUTHORIZATIONID'		=>	$transactionID,
+			'AMT'				=>	$amount,
+			'CURRENCYCODE'			=>	$currency,
+			'COMPLETETYPE'			=>	$type
+		);
+		$parameters = array_merge($parameters, $additionalParameters);
+		
+		$response = $this->call('DoCapture', $parameters);
+		
+		if (strtoupper($response['ACK']) != 'SUCCESS') throw new PayPalException('Got no valid response from PayPal. Payment failed.');
 	}
 }
 ?>
