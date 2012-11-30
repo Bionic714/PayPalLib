@@ -16,6 +16,7 @@
  * along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
  */
 namespace paypal;
+use \Exception;
 
 /**
  * This exception occurs if something goes wrong.
